@@ -13,8 +13,7 @@ router = APIRouter(
 )
 
 
-# @router.get("/",response_model=list[schemas.Post])
-@router.get("/")
+@router.get("/",response_model=list[schemas.PostOut])
 def get_post(db:Session = Depends(get_db)
     ,current_user:models.User = Depends(oauth2.get_current_user)
     ,limit: int = 10,skip:int = 0,search:Optional[str]=""):
@@ -26,12 +25,9 @@ def get_post(db:Session = Depends(get_db)
     ).join(
         models.Vote,
         models.Vote.post_id == models.Post.id,
-        isouter=True   # LEFT JOIN ✅
-    ).group_by(
-        models.Post.id
-    ).all()
-    print(results)
-    return results.__dict__
+        isouter=True).group_by(models.Post.id).limit(limit).offset(skip).all()
+    
+    return results
 
 @router.post("/", status_code=status.HTTP_201_CREATED,response_model=schemas.Post)
 def create_post(post: schemas.PostBase,db:Session = Depends(get_db),current_user:models.User = Depends(oauth2.get_current_user)):
@@ -44,11 +40,17 @@ def create_post(post: schemas.PostBase,db:Session = Depends(get_db),current_user
     return new_post
 
 
-@router.get("/{id}",response_model=schemas.Post)
+@router.get("/{id}",response_model=schemas.PostOut)
 def get_post(id:int,response:Response,db:Session = Depends(get_db)):
    
 
-    p = db.query(models.Post).filter(models.Post.id == id).first()
+    p = db.query(
+    models.Post,
+    func.count(models.Vote.user_id).label("votes")
+    ).join(
+        models.Vote,
+        models.Vote.post_id == models.Post.id,
+        isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
     if not p:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
