@@ -27,7 +27,7 @@ class Post(PostBase):
 class PostOut(BaseModel):
     Post:Post
     votes:int
-    
+
     class Config:
         from_attributes = True
 
@@ -52,3 +52,8 @@ class TokenData(BaseModel):
 class Vote(BaseModel):
     post_id: int
     dir: int
+
+class PostUpdate(BaseModel):
+    title: str
+    content: str
+    published: bool

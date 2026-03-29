@@ -82,7 +82,7 @@ def delete_post(id:int,db:Session=Depends(get_db),current_user:models.User = Dep
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @router.put("/{id}")
-def update_post(id:int,updated_post:schemas.Post,db:Session=Depends(get_db),current_user:models.User = Depends(oauth2.get_current_user)):
+def update_post(id:int,updated_post:schemas.PostUpdate,db:Session=Depends(get_db),current_user:models.User = Depends(oauth2.get_current_user)):
     
     post_query = db.query(models.Post).filter(models.Post.id == id)
     db_post = post_query.first()
