@@ -26,8 +26,8 @@ This project is a FastAPI application with a PostgreSQL database, running entire
 1. Clone the repository:
 
 ```bash
-git clone <your-repo-url>
-cd <your-repo-folder>
+git clone https://github.com/PR202111/Apis.git
+cd Apis
 ```
 
 2. Build and start the containers:
